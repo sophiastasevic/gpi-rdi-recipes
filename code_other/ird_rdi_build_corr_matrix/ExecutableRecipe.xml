@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<executable_recipe>
+    <sphere pipeline="test" user="sophia.stasevic@univ-grenoble-alpes.fr"/>
+    <frame_types>
+        <frame_type name="IRD_SCIENCE_REDUCED_MASTER_CUBE" description=""/>
+        <frame_type name="IRD_SCIENCE_LAMBDA_INFO" description=""/>
+        <frame_type name="IRD_FRAME_SELECTION_VECTOR" description=""/>
+        <frame_type name="IRD_SCIENCE_PARA_ROTATION_CUBE" description=""/>
+        <frame_type name="IRD_TIMESTAMP" description=""/>
+        <frame_type name="IRD_CORR_MATRIX" description=""/>
+        <frame_type name="IRD_CORR_FRAME_SELECTION_VECTOR" description=""/>
+        <frame_type name="IRD_REFERENCE_TABLE" description=""/>
+        <frame_type name="IRD_REFERENCE_FRAME_DATA" description=""/>
+        <frame_type name="IRD_RDI_TABLE_COLUMN_META" description=""/>
+        <frame_type name="IRD_RDI_REFERENCE_TARGET_FLAG" description=""/>
+    </frame_types>
+    <recipe name="ird_rdi_build_corr_matrix" instrument="IRDIS">
+        <synopsis value=""/>
+        <description short="Creates a matrix of Pearson Correlation Coeffients for science and reference frames" full="Creates a matrix of Pearson Correlation Coeffients for science and reference frames and queries asm data for the reference frame timestamps"/>
+        <author email="sophia.stasevic@univ-grenoble-alpes.fr" name="Sophia Stasevic"/>
+        <license value="GPL"/>
+    </recipe>
+    <executable>
+        <binary value="/dwh/sphere-exec-env/python3/.env_conda/bin/python"/>
+        <script value="ird_rdi_build_corr_matrix.py"/>
+        <includes>
+            <include regex=".*\.py"/>
+        </includes>
+    </executable>
+    <inputs use_sof="true">
+        <input_frame min="1" max="10000">
+            <frame_type value="IRD_SCIENCE_REDUCED_MASTER_CUBE"/>
+            <filename_parameter value=""/>
+            <description value="Reduced IRD science and reference cubes."/>
+        </input_frame>
+        <input_frame min="1" max="100">
+            <frame_type value="IRD_SCIENCE_LAMBDA_INFO"/>
+            <filename_parameter value=""/>
+            <description value="Filter wavelength vector of science cube(s)."/>
+        </input_frame>
+        <input_frame min="0" max="10000">
+            <frame_type value="IRD_FRAME_SELECTION_VECTOR"/>
+            <filename_parameter value=""/>
+            <description value="Frame selection vectors for science and reference cubes."/>
+        </input_frame>
+        <input_frame min="1" max="10000">
+            <frame_type value="IRD_SCIENCE_PARA_ROTATION_CUBE"/>
+            <filename_parameter value=""/>
+            <description value="Frame rotation vectors for science and reference cubes."/>
+        </input_frame>
+        <input_frame min="1" max="10000">
+            <frame_type value="IRD_TIMESTAMP"/>
+            <filename_parameter value=""/>
+            <description value="Frame timestamp vectors for science and reference cubes."/>
+        </input_frame>
+        <input_frame min="1" max="1">
+            <frame_type value="IRD_RDI_TABLE_COLUMN_META"/>
+            <filename_parameter value=""/>
+            <description value="Reference target table column names, data types, and corresponding data cube headers and cobrex star service keywords."/>
+        </input_frame>
+        <input_frame min="4" max="4">
+            <frame_type value="IRD_RDI_REFERENCE_TARGET_FLAG"/>
+            <filename_parameter value=""/>
+            <description value="Targets observed by IRDIS with a known directly imaged companion or disk, a visible binary within the FOV, or that are not stars."/>
+        </input_frame>
+    </inputs>
+    <outputs use_filename_parameter="false">
+        <output_frame format="FITS">
+            <frame_type value="IRD_CORR_MATRIX"/>
+            <default_name value="pcc_matrix.fits"/>
+            <filename_parameter value=""/>
+            <description value="Pearson Correlation Coeffient matrix of science and reference frames."/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_CORR_MATRIX"/>
+            <default_name value="pcc_matrix_ao_ring.fits"/>
+            <filename_parameter value=""/>
+            <description value="Pearson Correlation Coeffient matrix of science and reference frames within AO ring."/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_CORR_FRAME_SELECTION_VECTOR"/>
+            <default_name value="corr_frame_selection.fits"/>
+            <filename_parameter value=""/>
+            <description value="Frame selection vector, parang, and timestamps of reference cubes used in the matrix."/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="target_info_table.fits"/>
+            <filename_parameter value=""/>
+            <description value="Table containing reference target observation and stellar information."/>
+        </output_frame>
+        <output_frame format="CSV">
+            <frame_type value="IRD_REFERENCE_FRAME_DATA"/>
+            <default_name value="ref_frame_asm_data.csv"/>
+            <filename_parameter value=""/>
+            <description value="CSV file containing SPARTA r0, wind_eff, tau0, and ASM 200mbar wind speed for each reference frame"/>
+        </output_frame>
+    </outputs>
+    <parameters prefix="--">
+        <parameter name="inner_radius" optional="true">
+            <default_value value="10"/>
+            <type value="int"/>
+            <description value="Inner radius of correlation annulus."/>
+        </parameter>
+        <parameter name="outer_radius" optional="true">
+            <default_value value="50"/>
+            <type value="int"/>
+            <description value="Outer radius of correlation annulus."/>
+        </parameter>
+        <parameter name="wl_channels" optional="true">
+            <default_value value="0"/>
+            <type value="int"/>
+            <description value="Wavelength channel to use. 0=Channel 1, 1=Channel 2, 2=Channels 1 and 2"/>
+        </parameter>
+        <parameter name="use_science" optional="true">
+            <default_value value="False"/>
+            <type value="flag"/>
+            <description value="Calculate correlation of science cube with itself."/>
+        </parameter>
+        <parameter name="save_table" optional="true">
+            <default_value value="True"/>
+            <type value="flag"/>
+            <description value="Save a table and csv containing observational conditions and stellar parameters of the reference cubes taken from the cube fits header."/>
+        </parameter>
+        <parameter name="ao_corr" optional="true">
+            <default_value value="True"/>
+            <type value="flag"/>
+            <description value="Caclulate additional correlation within a 15px annulus at the AO correction radius."/>
+        </parameter>
+    </parameters>
+</executable_recipe>

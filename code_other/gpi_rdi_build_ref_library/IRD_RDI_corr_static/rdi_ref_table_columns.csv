@@ -1,0 +1,29 @@
+,hdr_name,star_name,simbad_name,data_type,unit,source
+Object,OBJECT,,,str,,
+RA,RA,,,float,deg,hdr
+Dec,DEC,,,float,deg,hdr
+Obs_date,DATE-OBS,,,str,,hdr
+Cube_Nframes,NAXIS3,,,int,,hdr
+Exptime,EXPTIME,,,float,s,hdr
+NDIT,ESO DET NDIT,,,float,,hdr
+Alt,ESO TEL ALT,,,float,deg,hdr
+Az,ESO TEL AZ,,,float,deg,hdr
+FWHM_mean_DIMM,ESO TEL AMBI FWHM MEAN,,,float,arcsec,hdr_try
+Tau0_mean_DIMM,ESO TEL TAU0 MEAN,,,float,s,hdr_try
+Wind_speed_tel_ambi,ESO TEL AMBI WINDSP,,,float,m/s,hdr
+Wind_dir_tel_ambi,ESO TEL AMBI WINDDIR,,,float,deg,hdr
+FWHM_tel_ambi_start,ESO TEL AMBI FWHM START,,,float,arcsec,hdr
+FWHM_tel_ambi_end,ESO TEL AMBI FWHM END,,,float,arcsec,hdr
+Tau0_tel_ambi,ESO TEL AMBI TAU0,,,float,s,hdr
+Strehl_avg_SPARTA,SR_AVG,,,float,,hdr_try
+Strehl_min_SPARTA,SR_MIN,,,float,,hdr_try
+Strehl_max_SPARTA,SR_MAX,,,float,,hdr_try
+FWHM_avg_SPARTA,SEEI_AVG,,,float,arcsec,hdr_try
+FWHM_min_SPARTA,SEEI_MIN,,,float,arcsec,hdr_try
+FWHM_max_SPARTA,SEEI_MAX,,,float,arcsec,hdr_try
+ESO_obs_start,ESO OBS START,,,str,,hdr
+G_mag,,flux g,simbad_FLUX_G,float,,star
+H_mag,,flux h,simbad_FLUX_H,float,,star
+K_mag,,flux k,simbad_FLUX_K,float,,star
+SpT,,spectral type,simbad_SP_TYPE,str,,star
+Simbad_ID,,simbad main identifier,simbad_MAIN_ID,str,,star

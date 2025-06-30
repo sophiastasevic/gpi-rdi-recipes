@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<executable_recipe>
+    <sphere pipeline="test" user="sophia.stasevic@univ-grenoble-alpes.fr"/>
+    <frame_types>
+        <frame_type name="IRD_SCIENCE_REDUCED_MASTER_CUBE" description=""/>
+        <frame_type name="IRD_FRAME_SELECTION_VECTOR" description=""/>
+        <frame_type name="IRD_CORR_MATRIX" description=""/>
+        <frame_type name="IRD_CORR_FRAME_SELECTION_VECTOR" description=""/>
+        <frame_type name="IRD_REFERENCE_TABLE" description=""/>
+        <frame_type name="IRD_REFERENCE_FRAME_DATA" description=""/>
+        <frame_type name="IRD_REFERENCE_CUBE" description=""/>
+        <frame_type name="IRD_REFERENCE_FRAME_SELECTION_VECTOR" description=""/>
+    </frame_types>
+    <recipe name="ird_rdi_create_ref_cube" instrument="IRDIS">
+        <synopsis value=""/>
+        <description short="Produce a reference cube containing reference target frames best correlated to the science frames." full=""/>
+        <author email="sophia.stasevic@univ-grenoble-alpes.fr" name="Sophia Stasevic"/>
+        <license value="GPL"/>
+    </recipe>
+    <executable>
+        <binary value="/dwh/sphere-exec-env/python3/.env_conda/bin/python"/>
+        <script value="ird_rdi_create_ref_cube.py"/>
+        <includes>
+            <include regex=".*\.py"/>
+        </includes>
+    </executable>
+    <inputs use_sof="true">
+        <input_frame min="1" max="1">
+            <frame_type value="IRD_SCIENCE_REDUCED_MASTER_CUBE"/>
+            <filename_parameter value=""/>
+            <description value="Centered data cube of science target"/>
+        </input_frame>
+        <input_frame min="0" max="1">
+            <frame_type value="IRD_FRAME_SELECTION_VECTOR"/>
+            <filename_parameter value=""/>
+            <description value="Frame selection vector of science cube"/>
+        </input_frame>
+        <input_frame min="1" max="1">
+            <frame_type value="IRD_CORR_MATRIX"/>
+            <filename_parameter value=""/>
+            <description value="Frame correlation matrix"/>
+        </input_frame>
+        <input_frame min="1" max="1">
+            <frame_type value="IRD_CORR_FRAME_SELECTION_VECTOR"/>
+            <filename_parameter value=""/>
+            <description value="Frame and target index of reference frames in the correlation matrix"/>
+        </input_frame>
+        <input_frame min="1" max="1">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <filename_parameter value=""/>
+            <description value="Table containing information on reference targets used in correlation"/>
+        </input_frame>
+        <input_frame min="1" max="1">
+            <frame_type value="IRD_REFERENCE_FRAME_DATA"/>
+            <filename_parameter value=""/>
+            <description value="CSV file containing ASM data for reference frames used in correlation"/>
+        </input_frame>
+    </inputs>
+    <outputs use_filename_parameter="false">
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_SEEING*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_TAU0*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_DIT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_NDIT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_EPOCH*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_MG*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_MH*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_SPT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_LWE*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_WDH*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_PCC*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_RAND*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_MIX*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_ELEV*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_CUBE"/>
+            <default_name value="reference_cube_EXPT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_SEEING*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_TAU0*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_DIT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_NDIT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_EPOCH*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_MG*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_MH*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_SPT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_LWE*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_WDH*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_PCC*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_RAND*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_MIX*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_ELEV*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_TABLE"/>
+            <default_name value="frame_info_table_EXPT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library frame information"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_SEEING*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_TAU0*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_DIT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_NDIT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_EPOCH*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_MG*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_MH*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_SPT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_LWE*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_WDH*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_PCC*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_RAND*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_MIX*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_ELEV*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+        <output_frame format="FITS">
+            <frame_type value="IRD_REFERENCE_FRAME_SELECTION_VECTOR"/>
+            <default_name value="frame_selection_vector_EXPT*.fits"/>
+            <filename_parameter value=""/>
+            <description value="RDI reference library wavelength and science frame selection vector"/>
+        </output_frame>
+    </outputs>
+    <parameters prefix="--">
+        <parameter name="ncorr" optional="true">
+            <default_value value="1000"/>
+            <type value="int"/>
+            <description value="no. of best correlated ref frames to include for each science frame"/>
+        </parameter>
+        <parameter name="crop" optional="true">
+            <default_value value=""/>
+            <type value="int"/>
+            <description value="px size to crop reference library frames to"/>
+        </parameter>
+        <parameter name="use_select_vect" optional="true">
+            <default_value value="False"/>
+            <type value="flag"/>
+            <description value="use science frame selection vector for reference frame selection (when not used for correlation matrix)"/>
+        </parameter>
+        <parameter name="remove_science" optional="true">
+            <default_value value="True"/>
+            <type value="flag"/>
+            <description value="do not use science frames in reference library if in correlation matrix"/>
+        </parameter>
+        <parameter name="param" optional="true">
+            <default_value value="'PCC'"/>
+            <type value="string"/>
+            <description value="ref target observation parameter to match to science, options: SEEING, TAU0, DIT, NDIT, EPOCH, MG, MH, LWE, WDH, ELEV, SPT, EXPT, PCC, RAND, MIX"/>
+        </parameter>
+        <parameter name="param_max" optional="true">
+            <default_value value="10000"/>
+            <type value="int"/>
+            <description value="number of reference frames to preselect for closely matching observing conditions"/>
+        </parameter>
+        <parameter name="mix_max" optional="true">
+            <type value="int"/>
+            <description value="number of parameter subgroup reference frames to preselect for MIX library [if building multiple libraries]"/>
+        </parameter>
+    </parameters>
+</executable_recipe>
