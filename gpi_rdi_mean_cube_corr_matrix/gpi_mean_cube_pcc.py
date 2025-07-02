@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 ## initialise header
 def init_header(ncubes, path_tmp, r_in, r_out, frm_paths):
     hdr = fits.Header()
-    hdr_tmp = fits.getheader(path_tmp)
+    hdr_tmp = read_file(fits.getheader, path_tmp)
     for k in ['PIXTOARC', 'ESO INS COMB IFLT', 'ESO INS2 COMB IFS', 'WL_STACK']:
         hdr[k] = (hdr_tmp[k], hdr_tmp.comments[k])
     
@@ -46,19 +46,19 @@ def update_header(hdr, i, target_row):
     
 ## create boolean mask for annulus within which correlation is calculated
 def create_mask(size, r_in, r_out):
-    cxy=(size//2,size//2)
-    mask_in=disk(cxy,r_in,shape=(size,size))
-    mask_out=disk(cxy,r_out,shape=(size,size))
-    mask=np.full((size,size),False)
-    mask[mask_out]=True
-    mask[mask_in]=False
+    cxy = (size//2, size//2)
+    mask_in = disk(cxy, r_in, shape=(size,size))
+    mask_out = disk(cxy, r_out, shape=(size,size))
+    mask = np.full((size,size), False)
+    mask[mask_out] = True
+    mask[mask_in] = False
 
     return mask
 
 ## apply mask to frame and subtract mean    
 def mask_frame(frame, mask):
     masked_frame = frame[mask]
-    return masked_frame-np.nanmean(masked_frame)
+    return masked_frame - np.nanmean(masked_frame)
 
 ## get indices of data cube frames to keep from frame selection vector if file exists, 
 ## otherwise use all frames     
@@ -66,17 +66,17 @@ def selection_vector(frame_path, nframes_0):
     if frame_path != 'na': 
         select_frames = read_file(fits.getdata, frame_path)
         ## sometimes there are two columns, 0: harsher selection, 1: soft selection
-        if len(select_frames.shape)>1: 
+        if select_frames.ndims > 1: 
             select_frames = select_frames[:,0]
         select_frames = np.where(select_frames==1.)[0]
     else: ## no frame selection vector
-        select_frames = np.arange(0,nframes_0)
+        select_frames = np.arange(0, nframes_0)
         
     return select_frames
 
 ## create mask and return pcc calculation region as a 2D array of dimensions (temporal x spatial)
 def format_cube(cube, r_in, r_out):
-    cube = fits.getdata(path)
+    cube = read_file(fits.getdata, path)
     nframe, nx, ny = cube.shape
     mask = create_mask(nx, r_in, r_out)
         
@@ -91,7 +91,7 @@ def pcc(frames):
     corr_matrix = np.ones((nframe, nframe))
     for i in range(nframe):
         ## diagonally symmetric so only compute one half of the diagonal
-        for j in range(nframe-1,i,-1):
+        for j in range(nframe-1, i, -1):
             if i==j: ## same frame, correlation == 1
                 continue
             else:
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         select_frames = selection_vector(paths['frame'][i], target_row['nframes'])  
         ## save the frame selection vector for each cube so we don't have to rematch
         ## them in the next recipe
-        frame_vect.append(np.stack((np.full_like(select_frames,i),select_frames))
+        frame_vect.append(np.stack((np.full_like(select_frames, i), select_frames))
         
         ## read in wl collapsed cube and apply frame selection vector
         cube_tmp = read_file(fits.getdata, paths['cube'][i])[select_frames]
