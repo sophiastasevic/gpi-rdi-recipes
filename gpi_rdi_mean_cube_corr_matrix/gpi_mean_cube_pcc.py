@@ -5,6 +5,7 @@ Created on Tue Jun 24 10:36:07 2025
 
 @author: sstas
 """
+import argparse
 import sys
 import warnings
 import numpy as np
@@ -46,19 +47,19 @@ def update_header(hdr, i, target_row):
     
 ## create boolean mask for annulus within which correlation is calculated
 def create_mask(size, r_in, r_out):
-    cxy = (size//2, size//2)
-    mask_in = disk(cxy, r_in, shape=(size,size))
-    mask_out = disk(cxy, r_out, shape=(size,size))
-    mask = np.full((size,size), False)
-    mask[mask_out] = True
-    mask[mask_in] = False
+    cxy=(size//2,size//2)
+    mask_in=disk(cxy,r_in,shape=(size,size))
+    mask_out=disk(cxy,r_out,shape=(size,size))
+    mask=np.full((size,size),False)
+    mask[mask_out]=True
+    mask[mask_in]=False
 
     return mask
 
 ## apply mask to frame and subtract mean    
 def mask_frame(frame, mask):
     masked_frame = frame[mask]
-    return masked_frame - np.nanmean(masked_frame)
+    return masked_frame-np.nanmean(masked_frame)
 
 ## get indices of data cube frames to keep from frame selection vector if file exists, 
 ## otherwise use all frames     
@@ -66,32 +67,29 @@ def selection_vector(frame_path, nframes_0):
     if frame_path != 'na': 
         select_frames = read_file(fits.getdata, frame_path)
         ## sometimes there are two columns, 0: harsher selection, 1: soft selection
-        if select_frames.ndims > 1: 
+        if len(select_frames.shape)>1: 
             select_frames = select_frames[:,0]
         select_frames = np.where(select_frames==1.)[0]
     else: ## no frame selection vector
-        select_frames = np.arange(0, nframes_0)
+        select_frames = np.arange(0,nframes_0)
         
     return select_frames
 
-## create mask and return pcc calculation region as a 2D array of dimensions (temporal x spatial)
+## mean combine cube along temporal dimention and then apply mask to keep
+## only the xy pixels within the pcc calculation region as a 1d array
 def format_cube(cube, r_in, r_out):
-    cube = read_file(fits.getdata, path)
-    nframe, nx, ny = cube.shape
+    cube_stack = np.nanmean(cube, axis=0)
+    nx, ny = cube_stack.shape
     mask = create_mask(nx, r_in, r_out)
         
-    masked_cube = np.zeros((nframe, np.count_nonzero(mask)))
-    for i in range(nframe):
-        masked_cube[i] = mask_frame(cube[i], mask)
-    return masked_cube
+    return mask_frame(cube_stack, mask)
 
-## calculate Pearson correlation coefficient between frames    
-def pcc(frames):
-    nframes = frames.shape[0]
+## calculate Pearson correlation coefficient between stacked cubes
+def pcc(frames, nframe):
     corr_matrix = np.ones((nframe, nframe))
     for i in range(nframe):
         ## diagonally symmetric so only compute one half of the diagonal
-        for j in range(nframe-1, i, -1):
+        for j in range(nframe-1,i,-1):
             if i==j: ## same frame, correlation == 1
                 continue
             else:
@@ -123,56 +121,56 @@ if __name__ == '__main__':
         print('[Warning] r_out <= r_in. Inner radius set to {0:d}'.format(r_out-1))
     
     ## frame types to read in and minimum number of inputs required
-    data_names = {'cube':('GPI_REDUCED_COLLAPSED_MASTER_CUBE', 1),
+    data_names = {'cube':('GPI_REDUCED_COLLAPSED_MASTER_CUBE', 2),
                   'frame':('GPI_FRAME_SELECTION_VECTOR', 0)}
     
-    print("..Sorting input targets..")
-    paths, target_data = get_paths(sofname, data_names)
+    print("..Getting cube information..")
+    cube_paths, frame_select_paths, target_data = get_paths(sofname, data_names)
     
-    ncubes = len(paths['cube'])
+    ncube = len(cube_paths)
     
-    hdr = init_header(ncubes, paths['cube'][-1], r_in, r_out, np.unique(paths['frame']))
+    hdr = init_header(ncube, paths['cube'][-1], r_in, r_out, np.unique(frame_select_paths))
     
     frames = []
     frame_vect = []
     
     print("..Reading in data cubes..")
     
-    for i in range(ncubes):
-        target_row = target_data.loc[paths['cube'][i]]
+    for i, (path, frm_path) in enumerate(zip(cube_paths, frame_select_paths):
+        target_row = target_data.loc[path]
         update_header(hdr, i, target_row)
         
-        select_frames = selection_vector(paths['frame'][i], target_row['nframes'])  
+        select_frames = selection_vector(frm_path, target_row['nframes'])  
         ## save the frame selection vector for each cube so we don't have to rematch
         ## them in the next recipe
-        frame_vect.append(np.stack((np.full_like(select_frames, i), select_frames))
+        frame_vect.append(np.stack((np.full_like(select_frames,i), select_frames))
         
         ## read in wl collapsed cube and apply frame selection vector
-        cube_tmp = read_file(fits.getdata, paths['cube'][i])[select_frames]
+        cube_tmp = read_file(fits.getdata, path)
+
+        ## stack cube along frame axis and apply mask to return a 1d array of the 
+        ## pcc calculation region
+        stack_frame = format_cube(cube_tmp[select_frames], r_in, r_out)
+        frames.append(frame_vect)
         
-        """
-        apply mask using format_cube function
-        
-        mean combine along axis 0 (could edit format_cube to mean combine then apply mask)
-        
-        append to frames
-        """
-        
+         
     print("..Saving target frame selections to CSV..")
     
+    ## concatenate frame_vect to get a 2d array where col 0 == index of the cube in the
+    ## path list, and col 1 == frame index of frame selection vector within the cube
     frame_vect = np.concatenate(frame_vect, axis=1)
-                         #frame index in cube  #cube index in path list
+    
+    ## convert to pandas Series and save as csv file
     frame_vect = pd.Series(data=frame_vect[1], index=frame_vect[0], name='frame_index')   
-    frame_vect.to_csv("gpi_frame_data.csv")
+    frame_vect.to_csv("corr_frame_vect.csv")
     
-    print("..Calculating correlation..")
+    print("..Calculating correlation between %d stacked cubes.." % ncube)
     
-    """
-    concatenate frames
+    ## go from a list of 1d arrays to a 2d array of size (ncube, npixel_mask)
+    frames = np.stack(frames)
     
-    calculate correlation using pcc function
-    
-    """
+    ## calculate PCC between each "frame"
+    corr_matrix = pcc(frames, ncube)
     
     print("..Saving correlation matrix to FITS..")
     

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<executable_recipe>
+    <sphere pipeline="test" user="sophia.stasevic@univ-grenoble-alpes.fr"/>
+    <frame_types>
+        <frame_type name="GPI_REDUCED_COLLAPSED_MASTER_CUBE" description="Wavelength collapsed GPI cubes."/>
+        <frame_type name="GPI_FRAME_SELECTION_VECTOR" description="GPI cube frame selection vectors."/>
+        <frame_type name="GPI_RDI_REFERENCE_TARGET_FLAG" description="Targets with directly imaged planets, disks, or visible binaries within the FOV."/>
+        <frame_type name="GPI_CORR_MATRIX" description="Pearson correlation coeffient matrix of wavelength and frame collapsed GPI cubes."/>
+        <frame_type name="GPI_CORR_FRAME_SELECTION_VECTOR" description="Frame selection vector of each GPI cube used in the matrix."/>
+        <frame_type name="GPI_CORR_TARGET_DATA" description="CSV file containing target name, epoch, stellar parameters, and path of each GPI cube."/>
+    </frame_types>
+    <recipe name="gpi_mean_cube_corr_matrix" instrument="GPI">
+        <synopsis value=""/>
+        <description short="Compute correlation between GPI cubes." full="Compute the Pearson correlation coefficient within an annulus between GPI cubes collapsed along wavelength and frame axis."/>
+        <author email="sophia.stasevic@univ-grenoble-alpes.fr" name="Sophia Stasevic"/>
+        <license value="GPL"/>
+    </recipe>
+    <executable>
+        <binary value="/dwh/sphere-exec-env/python3/.env_conda/bin/python"/>
+        <script value="gpi_mean_cube_pcc.py"/>
+        <includes>
+            <include regex=".*\.py"/>
+        </includes>
+    </executable>
+    <inputs use_sof="true">
+        <input_frame min="2" max="1000">
+            <frame_type value="GPI_REDUCED_COLLAPSED_MASTER_CUBE"/>
+            <filename_parameter value=""/>
+            <description value="Wavelength collapsed GPI cubes."/>
+        </input_frame>
+        <input_frame min="0" max="1000">
+            <frame_type value="GPI_FRAME_SELECTION_VECTOR"/>
+            <filename_parameter value=""/>
+            <description value="GPI cube frame selection vectors."/>
+        </input_frame>
+        <input_frame min="3" max="3">
+            <frame_type value="GPI_RDI_REFERENCE_TARGET_FLAG"/>
+            <filename_parameter value=""/>
+            <description value="Targets with directly imaged planets, disks, or visible binaries within the FOV."/>
+        </input_frame>
+    </inputs>
+    <outputs use_filename_parameter="false">
+        <output_frame format="FITS">
+            <frame_type value="GPI_CORR_MATRIX"/>
+            <default_name value="mean_cube_pcc_matrix.fits"/>
+            <filename_parameter value=""/>
+            <description value="Pearson correlation coeffient matrix of wavelength and frame collapsed GPI cubes."/>
+        </output_frame>
+        <output_frame format="CSV">
+            <frame_type value="GPI_CORR_FRAME_SELECTION_VECTOR"/>
+            <default_name value="corr_frame_vect.csv"/>
+            <filename_parameter value=""/>
+            <description value="Frame selection vector of each GPI cube used in the matrix."/>
+        </output_frame>
+        <output_frame format="CSV">
+            <frame_type value="GPI_REFERENCE_TARGET_DATA"/>
+            <default_name value="target_data.csv"/>
+            <filename_parameter value=""/>
+            <description value="CSV file containing target name, epoch, stellar parameters, and path of each GPI cube."/>
+        </output_frame>
+    </outputs>
+    <parameters prefix="--">
+        <parameter name="r_in" optional="false">
+            <default_value value="15"/>
+            <type value="int"/>
+            <description value="Inner radius of correlation annulus [px]."/>
+        </parameter>
+        <parameter name="r_out" optional="false">
+            <default_value value="50"/>
+            <type value="int"/>
+            <description value="Outer radius of correlation annulus [px]."/>
+        </parameter>
+    </parameters>
+</executable_recipe>
