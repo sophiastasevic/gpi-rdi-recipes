@@ -132,7 +132,7 @@ if __name__ == '__main__':
     hdr = init_header(ncube, paths['cube'][-1], r_in, r_out, np.unique(frame_select_paths))
     
     frames = []
-    frame_vect = []
+    nframe_cube = np.zeros(ncube, dtype=int)
     
     print("..Reading in data cubes..")
     
@@ -140,10 +140,8 @@ if __name__ == '__main__':
         target_row = target_data.loc[path]
         update_header(hdr, i, target_row)
         
-        select_frames = selection_vector(frm_path, target_row['nframes'])  
-        ## save the frame selection vector for each cube so we don't have to rematch
-        ## them in the next recipe
-        frame_vect.append(np.stack((np.full_like(select_frames,i), select_frames))
+        select_frames = selection_vector(frm_path, target_row['nframes']) 
+        nframe_cube[i] = len(select_frames) ## for boolean select_frames: np.count_nonzero(select_frames)
         
         ## read in wl collapsed cube and apply frame selection vector
         cube_tmp = read_file(fits.getdata, path)
@@ -153,16 +151,10 @@ if __name__ == '__main__':
         stack_frame = format_cube(cube_tmp[select_frames], r_in, r_out)
         frames.append(frame_vect)
         
-         
-    print("..Saving target frame selections to CSV..")
-    
-    ## concatenate frame_vect to get a 2d array where col 0 == index of the cube in the
-    ## path list, and col 1 == frame index of frame selection vector within the cube
-    frame_vect = np.concatenate(frame_vect, axis=1)
-    
-    ## convert to pandas Series and save as csv file
-    frame_vect = pd.Series(data=frame_vect[1], index=frame_vect[0], name='frame_index')   
-    frame_vect.to_csv("corr_frame_vect.csv")
+    df['nframe_keep'] = nframe_cube
+     
+    print("..Saving target information to CSV..")
+    df.to_csv("target_data.csv")
     
     print("..Calculating correlation between %d stacked cubes.." % ncube)
     

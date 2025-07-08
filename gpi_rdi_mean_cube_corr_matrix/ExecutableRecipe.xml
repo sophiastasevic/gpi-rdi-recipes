@@ -6,8 +6,7 @@
         <frame_type name="GPI_FRAME_SELECTION_VECTOR" description="GPI cube frame selection vectors."/>
         <frame_type name="GPI_RDI_REFERENCE_TARGET_FLAG" description="Targets with directly imaged planets, disks, or visible binaries within the FOV."/>
         <frame_type name="GPI_CORR_MATRIX" description="Pearson correlation coeffient matrix of wavelength and frame collapsed GPI cubes."/>
-        <frame_type name="GPI_CORR_FRAME_SELECTION_VECTOR" description="Frame selection vector of each GPI cube used in the matrix."/>
-        <frame_type name="GPI_CORR_TARGET_DATA" description="CSV file containing target name, epoch, stellar parameters, and path of each GPI cube."/>
+        <frame_type name="GPI_REFERENCE_TARGET_DATA" description="CSV file containing target name, epoch, stellar parameters, and path of each GPI cube."/>
     </frame_types>
     <recipe name="gpi_mean_cube_corr_matrix" instrument="GPI">
         <synopsis value=""/>
@@ -45,12 +44,6 @@
             <default_name value="mean_cube_pcc_matrix.fits"/>
             <filename_parameter value=""/>
             <description value="Pearson correlation coeffient matrix of wavelength and frame collapsed GPI cubes."/>
-        </output_frame>
-        <output_frame format="CSV">
-            <frame_type value="GPI_CORR_FRAME_SELECTION_VECTOR"/>
-            <default_name value="corr_frame_vect.csv"/>
-            <filename_parameter value=""/>
-            <description value="Frame selection vector of each GPI cube used in the matrix."/>
         </output_frame>
         <output_frame format="CSV">
             <frame_type value="GPI_REFERENCE_TARGET_DATA"/>

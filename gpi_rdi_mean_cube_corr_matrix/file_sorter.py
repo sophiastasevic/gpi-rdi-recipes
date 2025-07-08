@@ -222,14 +222,13 @@ def get_paths(sofname, data_names):
         except FileNotFoundError:
             print('> Warning: Could not find GPI_REDUCED_COLLAPSED_MASTER_CUBE file:', path)
     
-    print("..Saving target information to CSV..")
-    
     df = pd.DataFrame(target_data, index=pd.Index(cube_paths, name='path'))
     df.rename_axis(columns={'naxis3':'nframes'})
-    df.to_csv("target_data.csv")
     
     print("..Matching GPI_FRAME_SELECTION_VECTOR paths ..")
     ## match paths to frame selection vectors
     frame_select_paths = match_frame_select(data_paths['frame'], df['date-obs'], df['nframes'])
+    
+    df['frame_path'] = frame_select_paths
     
     return cube_paths, frame_select_paths, df
