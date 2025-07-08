@@ -44,7 +44,7 @@ def read_file(func, path, **kwargs):
      
 
 def get_constants_paths(fnames, ftypes):
-    signal_paths = fnames[np.where(ftypes=="IRD_RDI_REFERENCE_TARGET_FLAG")[0]]
+    signal_paths = fnames[np.where(ftypes=="GPI_RDI_REFERENCE_TARGET_FLAG")[0]]
     return signal_paths
 
 
@@ -150,47 +150,30 @@ def star_info(name, date, ra, dec, known_signal, star_data):
 
 ## reading header information from input frame selection vectors to match to
 ## data cubes + removes paths with missing files
-def match_frame_select(frame_paths_tmp, target_epochs, nframes):
-    frame_id_tmp = []
-    frame_date = []
+def match_frame_select(data_paths, target_epochs, nframes):
+    frame_paths_tmp = []
+    frame_epochs = []
     frame_nframe = []
-    problem_frames = []
-    for frame_path in frame_paths_tmp:
+    for frm_path in data_paths['frame']:
         try:
-            frame_hdr = read_file(fits.getheader, frame_path)
-            frame_id_tmp.append(frame_hdr['ESO OBS START'])
-            frame_date.append(frame_hdr['DATE'])
+            frame_hdr = read_file(fits.getheader, frm_path)
+            
+            frame_paths_tmp.append(frm_path)
+            frame_epochs.append(frame_hdr['DATE-OBS'])
             frame_nframe.append(frame_hdr['NAXIS{0:d}'.format(frame_hdr['NAXIS'])])
         
         except FileNotFoundError:
-            print('> Warning: Could not find GPI_FRAME_SELECTION_VECTOR file:', frame_path)
-            problem_frames.append(frame_path)
-    
-    frame_paths_tmp = [x for x in frame_paths_tmp if x not in problem_frames]
+            print('> Warning: Could not find GPI_FRAME_SELECTION_VECTOR file:', frm_path)
     
     ## matches each data cube to its frame selection vector
-    frame_id = []
     frame_paths = []
     for ei, epoch in enumerate(target_epochs):
-        frame_id.append(epoch)
-        framei = [i for i,x in enumerate(frame_id_tmp) if x==epoch and frame_nframe[i]==nframes[ei]]
+        framei = [i for i,x in enumerate(frame_epochs) if x==epoch and frame_nframe[i]==nframes[ei]]
         if len(framei)==0:
             frame_paths.append('na')
-            continue
+        else:
+            frame_paths.append(frame_paths_tmp[framei[-1]]) ## -1 is most recent file (if multiple)
         
-        if len(framei)==1:
-            framei=framei[0]
-        
-        elif len(framei)>1:
-            process_date = [x for i,x in enumerate(frame_date) if i in framei]
-            try:
-                framei = framei[process_date.index(frame_date[ei])]
-            
-            except ValueError:
-                framei = framei[process_date.index(max(process_date))]
-        
-        frame_paths.append(frame_paths_tmp[framei])
-           
     return frame_paths
         
 ## reading in + sorting file paths read from sof file
@@ -199,7 +182,7 @@ def get_paths(sofname, data_names):
     ## list of objects observed by SPHERE that are not stars
     known_signal = get_companion_disk_flag(signal_paths)
     
-    target_data = {k.lower():[] for k in save_header+list(save_star.keys())}
+    target_data = {k.lower():[] for k in save_header+list(save_star.keys())+['binary','planet','disk']}
     star_data = None
     cube_paths = []
     
@@ -208,12 +191,12 @@ def get_paths(sofname, data_names):
         try:
             hdr_tmp = read_file(fits.getheader, path)
 
-            sid, star_data = star_info(*[hdr_tmp[k] for k in save_header], known_signal, star_data)
+            sid, star_data = star_info(*[hdr_tmp[k] for k in save_header[:-1]], known_signal, star_data)
             
             cube_paths.append(path)
             
             ## save header and star info to the dict
-            for k in save_star.keys()+['binary','planet','disk']:
+            for k in list(save_star.keys())+['binary','planet','disk']:
                 target_data[k].append(star_data.loc[sid, k])
             
             for k in save_header:
@@ -223,11 +206,11 @@ def get_paths(sofname, data_names):
             print('> Warning: Could not find GPI_REDUCED_COLLAPSED_MASTER_CUBE file:', path)
     
     df = pd.DataFrame(target_data, index=pd.Index(cube_paths, name='path'))
-    df.rename_axis(columns={'naxis3':'nframes'})
+    df.rename(columns={'naxis3':'nframes'}, inplace=True)
     
     print("..Matching GPI_FRAME_SELECTION_VECTOR paths ..")
     ## match paths to frame selection vectors
-    frame_select_paths = match_frame_select(data_paths['frame'], df['date-obs'], df['nframes'])
+    frame_select_paths = match_frame_select(data_paths, df['date-obs'], df['nframes'])
     
     df['frame_path'] = frame_select_paths
     

@@ -6,7 +6,6 @@ Created on Tue Jun 24 10:36:07 2025
 @author: sstas
 """
 import argparse
-import sys
 import warnings
 import numpy as np
 from skimage.draw import disk
@@ -17,6 +16,7 @@ from file_sorter import get_paths, read_file
 
 warnings.simplefilter('ignore', category=AstropyWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 ## initialise header
 def init_header(ncubes, path_tmp, r_in, r_out, frm_paths):
@@ -38,7 +38,7 @@ def init_header(ncubes, path_tmp, r_in, r_out, frm_paths):
     return hdr
     
 def update_header(hdr, i, target_row):
-    obj, epoch, sid = target_row['object','date-obs','simbad main identifier']
+    obj, epoch, sid = target_row[['object','date-obs','simbad main identifier']]
     
     nb_str = '{0:04d}'.format(i)
     hdr['OBJ_'+nb_str] = obj
@@ -129,27 +129,27 @@ if __name__ == '__main__':
     
     ncube = len(cube_paths)
     
-    hdr = init_header(ncube, paths['cube'][-1], r_in, r_out, np.unique(frame_select_paths))
+    hdr = init_header(ncube, cube_paths[-1], r_in, r_out, np.unique(frame_select_paths))
     
     frames = []
     nframe_cube = np.zeros(ncube, dtype=int)
     
     print("..Reading in data cubes..")
     
-    for i, (path, frm_path) in enumerate(zip(cube_paths, frame_select_paths):
+    for i, (path, frm_path) in enumerate(zip(cube_paths, frame_select_paths)):
         target_row = target_data.loc[path]
         update_header(hdr, i, target_row)
         
-        select_frames = selection_vector(frm_path, target_row['nframes']) 
+        ## read in wl collapsed cube
+        cube_tmp = read_file(fits.getdata, path)
+        
+        select_frames = selection_vector(frm_path, cube_tmp.shape[0]) 
         nframe_cube[i] = len(select_frames) ## for boolean select_frames: np.count_nonzero(select_frames)
         
-        ## read in wl collapsed cube and apply frame selection vector
-        cube_tmp = read_file(fits.getdata, path)
-
         ## stack cube along frame axis and apply mask to return a 1d array of the 
         ## pcc calculation region
         stack_frame = format_cube(cube_tmp[select_frames], r_in, r_out)
-        frames.append(frame_vect)
+        frames.append(stack_frame)
         
     target_data['nframe_keep'] = nframe_cube
      
