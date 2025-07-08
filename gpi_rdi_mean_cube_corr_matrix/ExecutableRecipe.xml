@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <executable_recipe>
-    <sphere pipeline="test" user="sophia.stasevic@univ-grenoble-alpes.fr"/>
+    <sphere pipeline="test" user="constance.ducreux@obspm.fr"/>
     <frame_types>
         <frame_type name="GPI_REDUCED_COLLAPSED_MASTER_CUBE" description="Wavelength collapsed GPI cubes."/>
         <frame_type name="GPI_FRAME_SELECTION_VECTOR" description="GPI cube frame selection vectors."/>
@@ -11,7 +11,7 @@
     <recipe name="gpi_mean_cube_corr_matrix" instrument="GPI">
         <synopsis value=""/>
         <description short="Compute correlation between GPI cubes." full="Compute the Pearson correlation coefficient within an annulus between GPI cubes collapsed along wavelength and frame axis."/>
-        <author email="sophia.stasevic@univ-grenoble-alpes.fr" name="Sophia Stasevic"/>
+        <author email="constance.ducreux@obspm.fr" name="Constance Ducreux"/>
         <license value="GPL"/>
     </recipe>
     <executable>
