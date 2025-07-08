@@ -151,10 +151,10 @@ if __name__ == '__main__':
         stack_frame = format_cube(cube_tmp[select_frames], r_in, r_out)
         frames.append(frame_vect)
         
-    df['nframe_keep'] = nframe_cube
+    target_data['nframe_keep'] = nframe_cube
      
     print("..Saving target information to CSV..")
-    df.to_csv("target_data.csv")
+    target_data.to_csv("target_data.csv")
     
     print("..Calculating correlation between %d stacked cubes.." % ncube)
     
