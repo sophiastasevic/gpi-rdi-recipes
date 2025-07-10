@@ -6,7 +6,7 @@ Created on Wed Jul  9 21:18:12 2025
 @author: sstas
 """
 
-import os
+import os, re
 import warnings
 import numpy as np
 import pandas as pd
@@ -113,11 +113,11 @@ def check_paths(paths_tmp, science_path):
     elif "summer" in science_path and "summer" not in paths_tmp[0]:
         paths_tmp = ["/summer/sphere/data_ext" + p for p in paths_tmp]
     
-    data_ext = ["data%d_ext" % i for i in range(1,6)] + ["data_ext_cobrex%s" % x for x in ["", "_2"]]
+    data_ext = ["data%d_ext" % i for i in range(2,6)] + ["data%s_ext_cobrex" % x for x in ["", "2"]]
     
     for i, p in enumerate(paths_tmp):
         if p != "na" and read_file(os.path.exists, p) == False: 
-            if "data_ext" in p:
+            if "data_ext/" in p:
                 ## try different data extensions
                 for ext in data_ext:
                     p_try = p.replace("data_ext", ext)
