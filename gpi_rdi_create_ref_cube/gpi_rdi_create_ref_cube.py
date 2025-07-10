@@ -374,7 +374,7 @@ def make_ref_cube(cube_paths, ref_frame_vect, target_data, ref_hdr):
         try: ## path SHOULD exist, but just in case it doesn't, we want to move to the next cube
             cube = read_file(fits.getdata, path)
             
-            ref_cube.append(cube[:,frame_index])
+            ref_cube.append(cube[frame_index])
             add_header_ref_info(target_data.loc[path], i, frame_index, ref_hdr)
         
         except FileNotFoundError:
