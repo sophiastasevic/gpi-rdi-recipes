@@ -71,18 +71,17 @@ def print_cube_info(science_hdr, nframe):
     nframe : int
         Number of frames in science cube after applying frame selection vector.
     """
-    print('\n>> ESO INS COMB ICOR:', science_hdr['ESO INS COMB ICOR'])
+    print('\n>> ESO INS COMB ICOR:', science_hdr['ESO INS2 COMB IFS'])
     print('>> ESO INS COMB IFLT:', science_hdr['ESO INS COMB IFLT'])  
     
     print('\n------ Science cube ------')
     print('>> OBJECT:', science_hdr['OBJECT'])
     print('>> DATE-OBS:', science_hdr['DATE-OBS'])
-    print('>> DATASUM:', science_hdr['DATASUM'])
-    print('>> EXPTIME:', science_hdr['EXPTIME'])
-    shape = [science_hdr['NAXIS{0:d}'.format(x)] for x in [4,3,2,1]]
+    print('>> EXPTIME:', science_hdr['ITIME0']/1e6)
+    shape = [science_hdr['NAXIS{0:d}'.format(x)] for x in [3,2,1]]
     print('> science_cube.shape =', shape)
     science_hdr['SEL_VECT'] = (False, "Frame selection vector applied to science cube.")
-    if nframe != shape[1]:
+    if nframe != shape[0]:
         print('> No. frames after applying frame selection vector =', nframe)
         science_hdr['SEL_VECT'] = True
     else:
@@ -388,17 +387,29 @@ def make_ref_cube(cube_paths, ref_frame_vect, target_data, ref_hdr):
     print('> Reference library built using {0:d} reference target(s) and {1:d} frame(s).'
           .format(len(ref_cube),len(ref_frame_vect)))
     
-    return np.concatenate(ref_cube, axis=1), ref_hdr        
+    return np.concatenate(ref_cube, axis=0), ref_hdr        
 #%%
 """
 Frame-to-frame correlation
 """
+## calculate Pearson correlation coefficient between science and ref frames
+def pcc(science_frames, ref_frames):
+    sci_nframe = science_frames.shape[0]
+    ref_nframe = ref_frames.shape[0]
+    
+    corr_matrix = np.zeros((sci_nframe, ref_nframe))
+    for i in range(sci_nframe):
+        for j in range(ref_nframe):
+            corr_matrix[i,j] = np.corrcoef(science_frames[i], ref_frames[j])[0,1]
+                
+    return corr_matrix
 
 
 """
 ---------------------------------- MAIN CODE ----------------------------------
 """
 if __name__ == '__main__': 
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('sof', help='name of sof file', type=str)
     parser.add_argument('--r_in',help='Inner radius of correlation annulus.', type=int, default=15)
@@ -459,7 +470,10 @@ if __name__ == '__main__':
     """
     ## get best correlated cubes
     cube_select = preselect_cubes(science_cube_corr, nsample, target_data['nframe_keep'].to_numpy())
-    cube_paths, frame_select_paths = target_data.iloc[cube_select,['path','frame_path']]
+    
+    ref_data = target_data.iloc[cube_select]
+    cube_paths = ref_data['path']
+    frame_select_paths = ref_data['frame_path']
     
     """
     Prepare science cube and header
@@ -468,7 +482,7 @@ if __name__ == '__main__':
     science_cube = read_file(fits.getdata, paths['science'])
     select_frames = selection_vector(paths['frame'], size) 
     
-    print_cube_info(science_hdr, np.cout_nonzero(select_frames))
+    print_cube_info(science_hdr, np.count_nonzero(select_frames))
     complete_header(science_hdr, ncorr, nsample, r_in, r_out)
     
     mask = create_mask(size, r_in, r_out)
@@ -491,15 +505,10 @@ if __name__ == '__main__':
         ## save index of cube, i, and index of kept frames
         corr_frame_vect.append(np.stack((np.full_like(select_frames,i), select_frames)))
         
-        """
-        Apply frame selection and mask to ref cube
+        ref_frames = format_cube(cube_tmp, mask, select_frames)
         
-        Calculate PCC between science frames and ref frames
+        corr_matrix.append(pcc(science_frames, ref_frames))
         
-        Append PCC matrix to corr_matrix
-        
-        """
-    
     ## concatenate frame_vect to get a 2d array where col 0 == index of the cube in the
     ## path list, and col 1 == frame index of frame selection vector within the cube
     corr_frame_vect = np.concatenate(corr_frame_vect, axis=1)
@@ -525,3 +534,4 @@ if __name__ == '__main__':
     
     frame_hdu = fits.PrimaryHDU(data=ref_frame_select, header=ref_hdr)
     frame_hdu.writeto('frame_selection_vector.fits')
+    
