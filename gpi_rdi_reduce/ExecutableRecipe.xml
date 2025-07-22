@@ -2,10 +2,10 @@
 <executable_recipe>
     <sphere pipeline="test" user="sophia.stasevic@univ-grenoble-alpes.fr"/>
     <frame_types>
-        <frame_type name="GPI_REDUCED_COLLAPSED_MASTER_CUBE" description="Wavelength collapsed science cube to be reduced (and optional star-hopping reference cube)."/>
+        <frame_type name="GPI_REDUCED_COLLAPSED_MASTER_CUBE" description="Wavelength collapsed science cube to be reduced."/>
         <frame_type name="GPI_SCIENCE_PARA_ROTATION_CUBE" description="Science cube frame rotation angles."/>
         <frame_type name="GPI_SCIENCE_PSF_MASTER_CUBE" description="Science cube unmasked stellar PSF."/>
-        <frame_type name="GPI_FRAME_SELECTION_VECTOR" description="Science cube frame selection vector (and optional star-hopping reference cube frame selection vector)."/>
+        <frame_type name="GPI_FRAME_SELECTION_VECTOR" description="Science cube frame selection vector."/>
         <frame_type name="GPI_REFERENCE_CUBE" description="Reference library output of gpi_rdi_build_ref_library."/>
         <frame_type name="GPI_REFERENCE_FRAME_SELECTION_VECTOR" description="Reference library frame selection vector output of gpi_rdi_build_ref_library."/>
         <frame_type name="GPI_RDI_REDUCED_CUBE" description="RDI reduced science cube."/>
@@ -16,22 +16,22 @@
     </frame_types>
     <recipe name="gpi_rdi_reduce" instrument="GPIIS">
         <synopsis value=""/>
-        <description short="RDI PCA reduction of GPI data cube" full=""/>
+        <description short="RDI PCA reduction of wavelength stacked GPI data cube" full=""/>
         <author email="sophia.stasevic@univ-grenoble-alpes.fr" name="Sophia Stasevic"/>
         <license value="GPL"/>
     </recipe>
     <executable>
-        <binary value="/dwh/sphere-exec-env/python3/.env_conda/bin/python"/>
+        <binary value="/dwh/sphere-exec-env/python3/.env_vip/bin/python"/>
         <script value="gpi_rdi_reduce.py"/>
         <includes>
             <include regex=".*\.py"/>
         </includes>
     </executable>
     <inputs use_sof="true">
-        <input_frame min="1" max="2">
+        <input_frame min="1" max="1">
             <frame_type value="GPI_REDUCED_COLLAPSED_MASTER_CUBE"/>
             <filename_parameter value=""/>
-            <description value="Science cube to be reduced (and optional star-hopping reference cube)."/>
+            <description value="Science cube to be reduced."/>
         </input_frame>
         <input_frame min="1" max="1">
             <frame_type value="GPI_SCIENCE_PARA_ROTATION_CUBE"/>
@@ -48,17 +48,17 @@
             <filename_parameter value=""/>
             <description value="Science cube observation wavelengths."/>
         </input_frame>
-        <input_frame min="0" max="2">
+        <input_frame min="0" max="1">
             <frame_type value="GPI_FRAME_SELECTION_VECTOR"/>
             <filename_parameter value=""/>
-            <description value="Science cube frame selection vector (and optional star-hopping reference cube frame selection vector)."/>
+            <description value="Science cube frame selection vector."/>
         </input_frame>
-        <input_frame min="0" max="20">
+        <input_frame min="1" max="1">
             <frame_type value="GPI_REFERENCE_CUBE"/>
             <filename_parameter value=""/>
             <description value="Reference library output of gpi_rdi_build_ref_library."/>
         </input_frame>
-        <input_frame min="0" max="20">
+        <input_frame min="1" max="1">
             <frame_type value="GPI_REFERENCE_FRAME_SELECTION_VECTOR"/>
             <filename_parameter value=""/>
             <description value="Reference library frame selection vector output of gpi_rdi_build_ref_library."/>
@@ -67,205 +67,25 @@
     <outputs use_filename_parameter="false">
         <output_frame format="FITS">
             <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_DIT*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_EPOCH*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_ELEV*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_EXPT*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_LWE*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_MG*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_MH*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_MIX*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_NDIT*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_PCC*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_RAND*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_SEEING*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_SPT*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_STAR-HOPPING*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_TAU0*.fits"/>
-            <filename_parameter value=""/>
-            <description value="RDI reduced science cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_REDUCED_CUBE"/>
-            <default_name value="reduced_cube_WDH*.fits"/>
+            <default_name value="reduced_cube_stack.fits"/>
             <filename_parameter value=""/>
             <description value="RDI reduced science cube."/>
         </output_frame>
         <output_frame format="FITS">
             <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_DIT*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_EPOCH*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_ELEV*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_EXPT*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_LWE*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_MG*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_MH*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_MIX*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_NDIT*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_PCC*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_RAND*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_SEEING*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_SPT*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_STAR-HOPPING*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_TAU0*.fits"/>
-            <filename_parameter value=""/>
-            <description value="5-sigma contrast map of RDI reduced cube."/>
-        </output_frame>
-        <output_frame format="FITS">
-            <frame_type value="GPI_RDI_CONTRAST_MAP"/>
-            <default_name value="5-sig_contrast_map_WDH*.fits"/>
+            <default_name value="5-sig_contrast_map_stack.fits"/>
             <filename_parameter value=""/>
             <description value="5-sigma contrast map of RDI reduced cube."/>
         </output_frame>
         <output_frame format="CSV">
             <frame_type value="GPI_RDI_CONTRAST"/>
-            <default_name value="5-sig_contrast*.csv"/>
+            <default_name value="5-sig_contrast_stack.csv"/>
             <filename_parameter value=""/>
             <description value="5-sigma contrast of RDI reduced cube(s) measured radially."/>
         </output_frame>
         <output_frame format="FITS">
             <frame_type value="GPI_TEMPORARY"/>
-            <default_name value="residuals*.fits"/>
+            <default_name value="residuals.fits"/>
             <filename_parameter value=""/>
             <description value="Uncombined PSF subtracted frames."/>
         </output_frame>
@@ -281,15 +101,10 @@
             <type value="array"/>
             <description value="Number of PCs to subtract. For multiple, either comma seperated list or dash seperated (incl.) range (opt. comma seperated step size, e.g. 50-100,10 = [50,60,70,80,90,100])."/>
         </parameter>
-        <parameter name="crop" optional="true">
+        <parameter name="r_crop" optional="true">
             <default_value value=""/>
             <type value="int"/>
-            <description value="Crop frame xy to this size."/>
-        </parameter>
-        <parameter name="stack" optional="true">
-            <default_value value=""/>
-            <type value="flag"/>
-            <description value="Mean combine reduced cube along wavelength channels."/>
+            <description value="Radius of frame crop."/>
         </parameter>
         <parameter name="contrast" optional="true">
             <default_value value=""/>

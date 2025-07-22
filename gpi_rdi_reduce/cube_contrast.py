@@ -48,10 +48,13 @@ def get_psf(psf_path, d_aper):
         raise Exception("[Error] Input PSF is a dummy PSF.")
     
     if psf.ndim > 3: ## psf image before and after ADI sequence
-        psf = np.nanmean(psf,axis=1)
-    channels, x, y = psf.shape
+        psf = np.nanmean(psf, axis=(0,1))
+    else:
+        psf = np.nanmean(psf, axis=0)
     
-    fwhm, psf_sum, psf_max = calc_fwhm(np.nanmean(psf,axis=0), x, y, d_aper)
+    x, y = psf.shape
+    
+    fwhm, psf_sum, psf_max = calc_fwhm(psf, x, y, d_aper)
     psf_sum = psf_sum[0]
     print("Channel mean: lambda/D = {0:.2f} px, sum of PSF in aperture = {1:.2f} ADU".format(d_aper, psf_sum))
     
@@ -76,27 +79,21 @@ def calc_contrast(data, d_aper, size, psf, sigma=5, r_mask=0, dist=None):
         dist = np.arange(r_mask + d_aper/2, (size-d_aper)/2, d_aper)
     npcs = data.shape[0]; ndist = len(dist)
     
-    contrast = np.zeros((npcs,ndist))
+    contrast = np.zeros((ndist,npcs))
     for i,r in enumerate(dist):
         apers = generate_apertures(r, d_aper, size)
         for ipc in range(npcs):
             fluxes = photutils.aperture_photometry(data[ipc], apers)
             fluxes = np.array(fluxes["aperture_sum"])
-            contrast[ipc,i] = np.nanstd(fluxes)
+            contrast[i,ipc] = np.nanstd(fluxes)
     
     return sigma*contrast/psf, dist
 
-def contrast_df(contrast, dist, pcs, param, d_aper=None, wl=None, df_prev=None):
-    index = pd.MultiIndex.from_product([[param],pcs], names=['ref_lib','KL_modes'])
-    df = pd.DataFrame(contrast, index=index, columns=dist)
-    if wl is not None:
-        df = df.assign(channel=wl, aperture_diam=d_aper)
-        df.set_index(['channel','aperture_diam'], append=True, inplace=True)
+def contrast_df(contrast, dist, pcs, d_aper):
+    index = pd.MultiIndex.from_product([dist,[d_aper]], names=['separation[px]','aperture_diam'])
+    df = pd.DataFrame(contrast, index=index, columns=pcs)
     
-    if df_prev is None:
-        return df.rename_axis(columns="separation[px]")
-    else:
-        return pd.concat([df_prev, df.rename_axis(columns="separation[px]")])
+    return df.rename_axis(columns="KL_modes")
 
 ## create a contrast map using the standard deviation of a fwhm sized square aperture
 ## around each pixel in the frame
@@ -111,6 +108,7 @@ def calc_contrast_map(data, size, fwhm, psf_mean, sigma=5):
             ymax = min([size, y + ywin+1])
 
             contrast_map[...,x,y] = np.nanstd(data[...,xmin:xmax,ymin:ymax], axis=(-2,-1))
+    
     return sigma*contrast_map/psf_mean
     
     
